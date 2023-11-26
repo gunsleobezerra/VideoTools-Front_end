@@ -1,8 +1,8 @@
 ##Running Flask
 
-intall:
+install:
 	(cd flaskvue && npm install) &
-	(pip install -r requirements.txt)
+	(poetry install)
 
 run:
 	(cd flaskvue && npm run dev) &
