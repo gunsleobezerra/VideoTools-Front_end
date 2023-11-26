@@ -1,9 +1,11 @@
 ##Running Flask
 
 install:
-	(cd flaskvue && npm install) &
-	(poetry install)
+	(cd flaskvue && npm install)
+	poetry install
+	poetry shel
 
-run:
-	(cd flaskvue && npm run dev) &
-	(FLASK_APP=index.py FLASK_ENV=development flask run)
+run_dev:
+	(cd flaskvue && npm run dev) & (FLASK_APP=index.py FLASK_ENV=development flask run)
+
+	
