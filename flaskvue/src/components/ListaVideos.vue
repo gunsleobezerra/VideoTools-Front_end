@@ -1,23 +1,28 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import videosApi from '../../services/videosApi';
 import  Video  from '../../types';
 
 
+const isLoading = ref(true);
 
-videosApi.getVideos().then((response) => {
+onMounted(() => {
+  videosApi.getVideos().then((response) => {
     cards.value = response
-    isLoading.value = true
+    isLoading.value = false
     console.log(cards.value)
+});
 });
 
 
 
  const cards = ref<Video[]>([]);
 
- const isLoading = ref(false);
 
- function deleteVideo (event: any) {
+ async function deleteVideo (event: any) {
+    isLoading.value = true
+    //delay to show the spinner
+    
    let Video: Video = {
      id: event.target.parentElement.id,
      name: event.target.parentElement.children[0].innerText,
@@ -28,8 +33,13 @@ videosApi.getVideos().then((response) => {
     videosApi.deleteVideo(Video).then((response) => {
       console.log(response)
       
-      let card = document.getElementById(Video.id.toString())
-      card?.remove()
+       //refresh the list
+        videosApi.getVideos().then((response) => {
+          cards.value = response
+          isLoading.value = false
+          console.log(cards.value)
+
+        });
       }
     
     )
@@ -47,7 +57,7 @@ videosApi.getVideos().then((response) => {
 <template>
 
     
-<div v-if="isLoading && cards.length!=0" class="row row-cols-1 row-cols-md-2 g-4">
+<div v-if="!isLoading && cards.length!=0" class="row row-cols-1 row-cols-md-2 g-4">
   <div class="col" v-for="card in cards">
     <div  class="card mycard">
       <div class="card-body" :id="card.id.toString()">
@@ -61,16 +71,18 @@ videosApi.getVideos().then((response) => {
   </div>
 </div>
 
-<div v-else="cards.length!=0" class="d-flex justify-content-center">
+
+
+
+<div v-else-if="isLoading" class="d-flex justify-content-center">
   <div class="spinner-border" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>
 </div>
 
-<div v-else class="d-flex justify-content-center">
-  <h1>No videos</h1>
+<div v-else-if="!isLoading && cards.length==0" class="d-flex justify-content-center">
+  <h1>No videos found</h1>
 </div>
-
 
 </template>
 
